@@ -1,0 +1,17 @@
+body,
+#root {
+    display: flex;
+    flex-direction: column;
+    min-width: 240px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+}

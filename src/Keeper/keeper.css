@@ -1,0 +1,10 @@
+#keeper {
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+#keeper-header {
+    text-align: center;
+}

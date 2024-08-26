@@ -1,0 +1,13 @@
+
+{
+    "manifest_version": 3,
+    "name": "Keeper",
+    "description": "Password keeper",
+    "version": "1.0",
+    "action": {
+        "default_popup": "index.html"
+    },
+    "permissions": [
+        "storage"
+    ]
+}
