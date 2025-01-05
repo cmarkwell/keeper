@@ -1,38 +1,32 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback } from 'react';
 
-import { getAesGcmKey } from '../utils';
+import { useKey } from '../contexts/KeyContext';
 import AuthenticationForm from './AuthenticationForm';
+import Secrets from './Secrets';
 
 import './keeper.css';
 
 const Keeper = () => {
-    const [key, setKey] = useState();
+    const { key, loadKey } = useKey();
 
     const handleAuthenticationFormSubmitted = useCallback(async (event) => {
         event.preventDefault();
-
         const formData = new FormData(event.target);
         const { password } = Object.fromEntries([...formData.entries()]);
-        const aesGcmKey = await getAesGcmKey(password);
-        setKey(aesGcmKey);
-
-        // const encrypted = await aesGcmEncrypt(password, key);
-        // const decrypted = await aesGcmDecrypt(encrypted, key);
-        // console.log(decode(decrypted));
-    
+        loadKey(password);
         return false;
-    }, []);
+    }, [loadKey]);
 
     return (
-        <div id='keeper'>
-            <h1 id='keeper-header'>Keeper</h1>
+        <div className='keeper'>
+            <h1 className={`keeper-header keeper-header${key ? '' : '-no'}-key`}>
+                Keeper
+            </h1>
             {
                 key ? (
                     <Secrets />
                 ) : (
-                    <AuthenticationForm
-                        onSubmit={handleAuthenticationFormSubmitted}
-                    />
+                    <AuthenticationForm onSubmit={handleAuthenticationFormSubmitted} />
                 )
             }
         </div>

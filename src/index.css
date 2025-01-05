@@ -1,8 +1,13 @@
+* {
+    font-family: Verdana;
+}
+
 body,
 #root {
     display: flex;
     flex-direction: column;
-    min-width: 240px;
+    margin: 0;
+    min-width: 275px;
 }
 
 form {
@@ -14,4 +19,39 @@ form {
 .form-item {
     display: flex;
     flex-direction: column;
+}
+
+.form-item-input {
+    display: flex;
+    position: relative;
+}
+
+.form-item-input input {
+    flex: 1 1 auto;
+}
+
+.form-item-input i {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    font-size: 1.2rem;
+    font-weight: 600;
+    height: 100%;
+    position: absolute;
+    right: 6px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.form-actions-item {
+    flex: 1 1 auto;
+}
+
+button,
+input[type='submit'] {
+    cursor: pointer;
 }

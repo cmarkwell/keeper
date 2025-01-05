@@ -1,0 +1,32 @@
+#encryption-form {
+    padding: 12px;
+}
+
+#encryption-form input:read-only:not([type="submit"]) {
+    border: none;
+    padding: 0;
+}
+
+#encryption-form .form-item {
+    flex: 0 0 37px;
+}
+
+.encryption-form-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.encryption-form-actions .keeper-button {
+    background-color: white;
+    color: black;
+}
+
+.encryption-form-actions > div {
+    display: flex;
+    gap: 12px;
+}
+
+.encryption-form-actions .encryption-form-actions-delete {
+    color: red;
+}

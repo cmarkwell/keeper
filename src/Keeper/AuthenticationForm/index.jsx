@@ -1,3 +1,5 @@
+import PasswordInput from '../PasswordInput';
+
 import './authenticationForm.css';
 
 const AuthenticationForm = ({
@@ -7,20 +9,15 @@ const AuthenticationForm = ({
         id='authentication-form'
         onSubmit={onSubmit}
     >
-        <div className='form-item'>
-            <label for='password'>Password</label>
-            <input
-                id='password'
-                name='password'
-                type='password'
-                maxLength='32'
-                required
-                autoFocus
-            />
-        </div>
-        <div className='form-item'>
+        <PasswordInput
+            maxLength='32'
+            required
+            autoFocus
+        />
+        <div className='form-actions'>
             <input
                 id='submit'
+                className='form-actions-item'
                 name='submit'
                 type='submit'
                 value='Unlock'

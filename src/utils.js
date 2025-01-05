@@ -1,4 +1,4 @@
-const IV_BYTELENGTH = 12;
+import { IV_BYTELENGTH } from './consts';
 
 function encode(message) {
     const encoder = new TextEncoder();
@@ -28,8 +28,10 @@ async function aesGcmEncrypt(data, key) {
         key,
         encoded,
     );
-
-    return [encrypted, iv];
+    return [
+        ...(new Uint8Array(encrypted)),
+        ...iv,
+    ];
 }
 
 function aesGcmDecrypt(data, key, iv) {
@@ -46,4 +48,4 @@ export {
     getAesGcmKey,
     aesGcmEncrypt,
     aesGcmDecrypt,
-}
+};
