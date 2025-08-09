@@ -9,7 +9,7 @@ import './keeper.css';
 const Keeper = () => {
     const { key, loadKey } = useKey();
 
-    const handleAuthenticationFormSubmitted = useCallback(async (event) => {
+    const handleAuthenticationFormSubmitted = useCallback((event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
         const { password } = Object.fromEntries([...formData.entries()]);

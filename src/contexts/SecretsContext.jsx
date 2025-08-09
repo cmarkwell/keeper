@@ -47,7 +47,7 @@ const SecretsProvider = ({
             .then((results = {}) => {
                 dispatch({
                     type: LOAD_SECRETS,
-                    payload: results['keeper-secrets'],
+                    payload: results['keeper-secrets'] ?? [],
                 });
             });
     }, []);

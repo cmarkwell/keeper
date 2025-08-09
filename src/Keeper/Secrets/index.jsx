@@ -47,8 +47,8 @@ const Secrets = () => {
     const filteredSecrets = useMemo(() => (
         secrets
             .filter(({ username, website }) => (
-                username.toLowerCase().includes(searchValue.toLowerCase()) ||
-                website.toLowerCase().includes(searchValue.toLowerCase())
+                username.trim().toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+                website.trim().toLowerCase().includes(searchValue.trim().toLowerCase())
             ))
             .sort((secretA, secretB) => (
                 secretA.website.localeCompare(secretB.website, 'en', { sensitivity: 'base' })
@@ -71,8 +71,6 @@ const Secrets = () => {
                 ) : (
                     <>
                         <SecretsListActions
-                            searchValue={searchValue}
-                            onSearchValueChanged={setSearchValue}
                             onAddNewClicked={() => setShowEncryptionForm(true)}
                             onLogOutClicked={unloadKey}
                         />

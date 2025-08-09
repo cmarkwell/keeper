@@ -28,10 +28,12 @@ const EncryptionForm = ({
     ], [password]);
 
     const onClickDelete = useCallback(() => {
+        // TODO: Use custom confirm, browser confirm wrecks the extension
         deleteSecret(id);
         onCancel();
     }, [deleteSecret, id, onCancel]);
 
+    // TODO: This should maybe employ the new use hook in React 19
     useEffect(() => {
         aesGcmDecrypt(data, key, iv)
             .then((result) => setDefaultPassword(decode(result)));
@@ -54,14 +56,14 @@ const EncryptionForm = ({
                                 title={readOnly ? 'Edit this secret' : 'Cancel edits'}
                                 onClick={() => setReadOnly((old) => !old)}
                             >
-                                <i className={`bi-${readOnly ? 'pencil' : 'x'}`} />
+                                <i className={`bi-${readOnly ? 'pencil' : 'x'}`} />{readOnly ? 'Edit' : 'Cancel'}
                             </button>
                             <button
                                 className='keeper-button keeper-button-icon encryption-form-actions-delete'
                                 title='Delete this secret'
                                 onClick={onClickDelete}
                             >
-                                <i className='bi-trash' />
+                                <i className='bi-trash' />Delete
                             </button>
                         </div>
                     )
