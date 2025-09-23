@@ -9,26 +9,21 @@ import './keeper.css';
 const Keeper = () => {
     const { key, loadKey } = useKey();
 
-    const handleAuthenticationFormSubmitted = useCallback((event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const { password } = Object.fromEntries([...formData.entries()]);
-        loadKey(password);
-        return false;
-    }, [loadKey]);
+    const handleAuthenticationFormSubmitted = useCallback(
+        (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const { password } = Object.fromEntries([...formData.entries()]);
+            loadKey(password);
+            return false;
+        },
+        [loadKey],
+    );
 
     return (
         <div className='keeper'>
-            <h1 className={`keeper-header keeper-header${key ? '' : '-no'}-key`}>
-                Keeper
-            </h1>
-            {
-                key ? (
-                    <Secrets />
-                ) : (
-                    <AuthenticationForm onSubmit={handleAuthenticationFormSubmitted} />
-                )
-            }
+            <h1 className={`keeper-header keeper-header${key ? '' : '-no'}-key`}>Keeper</h1>
+            {key ? <Secrets /> : <AuthenticationForm onSubmit={handleAuthenticationFormSubmitted} />}
         </div>
     );
 };

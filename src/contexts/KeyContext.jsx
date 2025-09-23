@@ -1,12 +1,10 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, use, useCallback, useMemo, useState } from 'react';
 
 import { getAesGcmKey } from '../utils';
 
 const KeyContext = createContext();
 
-const KeyProvider = ({
-    children,
-}) => {
+const KeyProvider = ({ children }) => {
     const [key, setKey] = useState();
 
     const loadKey = useCallback(async (key) => {
@@ -18,25 +16,20 @@ const KeyProvider = ({
         setKey();
     }, []);
 
-    const value = useMemo(() => ({
-        key,
-        loadKey,
-        unloadKey,
-    }), [key, loadKey, unloadKey]);
-
-    return (
-        <KeyContext.Provider value={value}>
-            {children}
-        </KeyContext.Provider>
+    const value = useMemo(
+        () => ({
+            key,
+            loadKey,
+            unloadKey,
+        }),
+        [key, loadKey, unloadKey],
     );
+
+    return <KeyContext.Provider value={value}>{children}</KeyContext.Provider>;
 };
 
-const useKey = () => (
-    useContext(KeyContext)
-);
+const useKey = () => use(KeyContext);
 
-export {
-    useKey,
-};
+export { useKey };
 
 export default KeyProvider;

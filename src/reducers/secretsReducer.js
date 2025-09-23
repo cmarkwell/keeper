@@ -1,4 +1,5 @@
 const ADD_SECRET = 'ADD_SECRET';
+const IMPORT_SECRET = 'IMPORT_SECRET';
 const UPDATE_SECRET = 'UPDATE_SECRET';
 const DELETE_SECRET = 'DELETE_SECRET';
 const LOAD_SECRETS = 'LOAD_SECRETS';
@@ -9,17 +10,21 @@ function secretsReducer(state, action) {
             return action.payload ?? state;
         }
         case ADD_SECRET: {
+            const dateCreated = Date.now();
             const secret = {
                 id: self.crypto.randomUUID(),
-                dateCreated: Date.now(),
+                dateCreated,
+                dateLastModified: dateCreated,
                 ...action.payload,
             };
             return state.concat(secret);
         }
+        case IMPORT_SECRET:
+            return state.concat(action.payload);
         case UPDATE_SECRET: {
-            return state.map(
-                (secret) => secret.id === action.payload.id
-                    ? action.payload
+            return state.map((secret) =>
+                secret.id === action.payload.id && secret.dateLastModified === action.payload.dateLastModified
+                    ? { ...action.payload, dateLastModified: Date.now() }
                     : secret,
             );
         }
@@ -32,11 +37,6 @@ function secretsReducer(state, action) {
     }
 }
 
-export {
-    ADD_SECRET,
-    UPDATE_SECRET,
-    DELETE_SECRET,
-    LOAD_SECRETS,
-};
+export { ADD_SECRET, IMPORT_SECRET, UPDATE_SECRET, DELETE_SECRET, LOAD_SECRETS };
 
 export default secretsReducer;

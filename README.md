@@ -25,7 +25,8 @@ Begin by defining an encryption key
 ### Todo
 
 - Convert to TypeScript
-- Update to React 19
-- Explore encrypting username and website
+- Add password generator
 - Explore multiple accounts / key verification
+    - If decryption fails, show that the account was encrypted with another key
 - Add ability to export and import secrets
+    - If none can be decrypred, shout about it

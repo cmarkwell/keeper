@@ -7,18 +7,19 @@ body,
     display: flex;
     flex-direction: column;
     margin: 0;
-    min-width: 275px;
+    min-width: 300px;
 }
 
 form {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 9px;
 }
 
 .form-item {
     display: flex;
     flex-direction: column;
+    gap: 3px;
 }
 
 .form-item-input {
@@ -54,4 +55,14 @@ form {
 button,
 input[type='submit'] {
     cursor: pointer;
+}
+
+@keyframes skeleton {
+    from {
+        background-color: lightgray;
+    }
+
+    to {
+        background-color: transparent;
+    }
 }

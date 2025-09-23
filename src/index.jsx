@@ -10,12 +10,12 @@ import './index.css';
 
 const root = document.getElementById('root');
 
-createRoot(root).render((
+createRoot(root).render(
     <StrictMode>
         <KeyProvider>
             <SecretsProvider>
                 <Keeper />
             </SecretsProvider>
         </KeyProvider>
-    </StrictMode>
-));
+    </StrictMode>,
+);

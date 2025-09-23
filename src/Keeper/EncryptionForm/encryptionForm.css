@@ -1,13 +1,22 @@
-#encryption-form {
+.encryption-form {
     padding: 12px;
 }
 
-#encryption-form input:read-only:not([type="submit"]) {
+.encryption-form input:read-only:not([type='submit']) {
     border: none;
+    font-weight: 600;
     padding: 0;
 }
 
-#encryption-form .form-item {
+.encryption-form input:read-only:not([type='submit']):focus-visible {
+    outline: none;
+}
+
+.encryption-form input::placeholder {
+    font-weight: 400;
+}
+
+.encryption-form .form-item {
     flex: 0 0 37px;
 }
 
@@ -27,6 +36,6 @@
     gap: 12px;
 }
 
-.encryption-form-actions .encryption-form-actions-delete {
+.encryption-form-actions .keeper-button:has(.bi-trash) {
     color: red;
 }

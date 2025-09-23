@@ -10,6 +10,19 @@ function decode(message) {
     return decoder.decode(message);
 }
 
+function getFileText(file) {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+        fileReader.onerror = () => {
+            reject(fileReader.error);
+        };
+        fileReader.readAsText(file);
+    });
+}
+
 function getAesGcmKey(rawData) {
     return crypto.subtle.importKey(
         'raw',
@@ -23,29 +36,14 @@ function getAesGcmKey(rawData) {
 async function aesGcmEncrypt(data, key) {
     const iv = crypto.getRandomValues(new Uint8Array(IV_BYTELENGTH));
     const encoded = encode(data);
-    const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
-        key,
-        encoded,
-    );
-    return [
-        ...(new Uint8Array(encrypted)),
-        ...iv,
-    ];
+    const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, encoded);
+    return [...new Uint8Array(encrypted), ...iv];
 }
 
-function aesGcmDecrypt(data, key, iv) {
-    return crypto.subtle.decrypt(
-        { name: 'AES-GCM', iv },
-        key,
-        data,
-    );
+function aesGcmDecrypt(data, key) {
+    const encrypted = new Uint8Array(data.slice(0, -IV_BYTELENGTH));
+    const iv = new Uint8Array(data.slice(-IV_BYTELENGTH));
+    return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encrypted);
 }
 
-export {
-    encode,
-    decode,
-    getAesGcmKey,
-    aesGcmEncrypt,
-    aesGcmDecrypt,
-};
+export { encode, decode, getFileText, getAesGcmKey, aesGcmEncrypt, aesGcmDecrypt };

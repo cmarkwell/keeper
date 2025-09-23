@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { IV_BYTELENGTH } from '../../consts';
+import Button from '../../components/Button';
 import { useKey } from '../../contexts/KeyContext';
 import { useSecrets } from '../../contexts/SecretsContext';
 import { aesGcmDecrypt, decode } from '../../utils';
@@ -8,24 +8,12 @@ import PasswordInput from '../PasswordInput';
 
 import './encryptionForm.css';
 
-const EncryptionForm = ({
-    id,
-    username = '',
-    password = '',
-    website = '',
-    onSubmit,
-    onCancel,
-}) => {
+const EncryptionForm = ({ id, username = '', email = '', password = '', website = '', onSubmit, onCancel }) => {
     const { key } = useKey();
     const { deleteSecret } = useSecrets();
 
     const [readOnly, setReadOnly] = useState(id);
     const [defaultPassword, setDefaultPassword] = useState();
-
-    const [data, iv] = useMemo(() => [
-        new Uint8Array(password.slice(0, -IV_BYTELENGTH)),
-        new Uint8Array(password.slice(-IV_BYTELENGTH)),
-    ], [password]);
 
     const onClickDelete = useCallback(() => {
         // TODO: Use custom confirm, browser confirm wrecks the extension
@@ -35,48 +23,46 @@ const EncryptionForm = ({
 
     // TODO: This should maybe employ the new use hook in React 19
     useEffect(() => {
-        aesGcmDecrypt(data, key, iv)
-            .then((result) => setDefaultPassword(decode(result)));
-    }, [data, iv, key]);
+        aesGcmDecrypt(password, key).then((result) => setDefaultPassword(decode(result)));
+    }, [password, key]);
 
     return (
         <>
             <div className='encryption-form-actions'>
-                <button
-                    className='keeper-button keeper-button-icon'
-                    onClick={onCancel}
-                >
-                    <i className='bi-arrow-left' />Back
-                </button>
-                {
-                    id && (
-                        <div>
-                            <button
-                                className='keeper-button keeper-button-icon'
-                                title={readOnly ? 'Edit this secret' : 'Cancel edits'}
-                                onClick={() => setReadOnly((old) => !old)}
-                            >
-                                <i className={`bi-${readOnly ? 'pencil' : 'x'}`} />{readOnly ? 'Edit' : 'Cancel'}
-                            </button>
-                            <button
-                                className='keeper-button keeper-button-icon encryption-form-actions-delete'
-                                title='Delete this secret'
-                                onClick={onClickDelete}
-                            >
-                                <i className='bi-trash' />Delete
-                            </button>
-                        </div>
-                    )
-                }
+                <Button leftIcon='bi-arrow-left' onClick={onCancel}>
+                    Back
+                </Button>
+                {id && (
+                    <div>
+                        <Button
+                            rightIcon={`bi-${readOnly ? 'pencil' : 'x'}`}
+                            title={readOnly ? 'Edit this secret' : 'Cancel edits'}
+                            onClick={() => setReadOnly((old) => !old)}
+                        >
+                            {readOnly ? 'Edit' : 'Cancel'}
+                        </Button>
+                        <Button rightIcon='bi-trash' title='Delete this secret' onClick={onClickDelete}>
+                            Delete
+                        </Button>
+                    </div>
+                )}
             </div>
-            <form
-                id='encryption-form'
-                onSubmit={onSubmit}
-            >
+            <form className='encryption-form' onSubmit={onSubmit}>
+                <div className='form-item'>
+                    <label htmlFor='website'>Website</label>
+                    <input
+                        className='website'
+                        name='website'
+                        type='text'
+                        defaultValue={website}
+                        readOnly={readOnly}
+                        required
+                    />
+                </div>
                 <div className='form-item'>
                     <label htmlFor='username'>Username</label>
                     <input
-                        id='username'
+                        className='username'
                         name='username'
                         type='text'
                         defaultValue={username}
@@ -85,35 +71,23 @@ const EncryptionForm = ({
                         required
                     />
                 </div>
-                <PasswordInput
-                    defaultValue={defaultPassword}
-                    readOnly={readOnly}
-                    required
-                />
                 <div className='form-item'>
-                    <label htmlFor='website'>Website</label>
+                    <label htmlFor='email'>Email</label>
                     <input
-                        id='website'
-                        name='website'
-                        type='text'
-                        defaultValue={website}
+                        className='email'
+                        name='email'
+                        type='email'
+                        defaultValue={email}
                         readOnly={readOnly}
-                        required
+                        placeholder={readOnly ? 'None' : undefined}
                     />
                 </div>
-                {
-                    !readOnly && (
-                        <div className='form-actions'>
-                            <input
-                                id='submit'
-                                className='form-actions-item'
-                                name='submit'
-                                type='submit'
-                                value='Encrypt'
-                            />
-                        </div>
-                    )
-                }
+                <PasswordInput defaultValue={defaultPassword} readOnly={readOnly} required />
+                {!readOnly && (
+                    <div className='form-actions'>
+                        <input className='form-actions-item' name='submit' type='submit' value='Encrypt' />
+                    </div>
+                )}
             </form>
         </>
     );

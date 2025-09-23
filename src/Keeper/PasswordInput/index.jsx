@@ -8,7 +8,7 @@ const PasswordInput = (inputProps) => {
             <label htmlFor='password'>Password</label>
             <div className='form-item-input'>
                 <input
-                    id='password'
+                    className='password'
                     name='password'
                     type={passwordVisible ? 'text' : 'password'}
                     {...inputProps}

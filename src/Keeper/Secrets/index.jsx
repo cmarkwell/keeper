@@ -1,11 +1,12 @@
-import { useCallback, useMemo, useState } from 'react';
+import { Suspense, useCallback, useMemo, useState } from 'react';
 
 import { useKey } from '../../contexts/KeyContext';
 import { useSecrets } from '../../contexts/SecretsContext';
 import EncryptionForm from '../EncryptionForm';
 
+import SecretsList from './SecretsList';
 import SecretsListActions from './SecretsListActions';
-import SecretListItem from './SecretListItem';
+import SecretsListItem from './SecretsList/SecretsListItem';
 
 import './secrets.css';
 
@@ -17,89 +18,65 @@ const Secrets = () => {
     const [searchValue, setSearchValue] = useState('');
     const [secretId, setSecretId] = useState(null);
 
+    const selectedSecret = useMemo(() => secrets.find(({ id }) => id === secretId), [secretId, secrets]);
+
     const handleEncyptionFormClosed = useCallback(() => {
         setShowEncryptionForm(false);
         setSecretId(null);
     }, []);
 
-    const handleEncryptionFormSubmitted = useCallback(async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const { username, password, website } = Object.fromEntries([...formData.entries()]);
-        if (secretId) {
-            updateSecret({
-                id: secretId,
-                username,
-                password,
-                website,
-            });
-        } else {
-            addSecret(
-                username,
-                password,
-                website,
-            );
-        }
-        handleEncyptionFormClosed();
-        return false;
-    }, [addSecret, handleEncyptionFormClosed, secretId, updateSecret]);
-
-    const filteredSecrets = useMemo(() => (
-        secrets
-            .filter(({ username, website }) => (
-                username.trim().toLowerCase().includes(searchValue.trim().toLowerCase()) ||
-                website.trim().toLowerCase().includes(searchValue.trim().toLowerCase())
-            ))
-            .sort((secretA, secretB) => (
-                secretA.website.localeCompare(secretB.website, 'en', { sensitivity: 'base' })
-            ))
-    ), [searchValue, secrets]);
-
-    const selectedSecret = useMemo(() => (
-        secrets.find(({ id }) => id === secretId)
-    ), [secretId, secrets]);
+    const handleEncryptionFormSubmitted = useCallback(
+        async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const { username, email, password, website } = Object.fromEntries([...formData.entries()]);
+            if (selectedSecret) {
+                updateSecret({
+                    id: selectedSecret.id,
+                    dateLastModified: selectedSecret.dateLastModified,
+                    username,
+                    email,
+                    password,
+                    website,
+                });
+            } else {
+                addSecret({ username, email, password, website });
+            }
+            handleEncyptionFormClosed();
+            return false;
+        },
+        [addSecret, handleEncyptionFormClosed, selectedSecret, updateSecret],
+    );
 
     return (
         <div className='secrets'>
-            {
-                showEncryptionForm || selectedSecret ? (
-                    <EncryptionForm
-                        {...selectedSecret}
-                        onSubmit={handleEncryptionFormSubmitted}
-                        onCancel={handleEncyptionFormClosed}
+            {showEncryptionForm || selectedSecret ? (
+                <EncryptionForm
+                    {...selectedSecret}
+                    onSubmit={handleEncryptionFormSubmitted}
+                    onCancel={handleEncyptionFormClosed}
+                />
+            ) : (
+                <>
+                    <SecretsListActions
+                        onAddNewClicked={() => setShowEncryptionForm(true)}
+                        onLogOutClicked={unloadKey}
                     />
-                ) : (
-                    <>
-                        <SecretsListActions
-                            onAddNewClicked={() => setShowEncryptionForm(true)}
-                            onLogOutClicked={unloadKey}
-                        />
+                    <div className='secrets-list-search-container'>
                         <input
-                            id='secrets-list-search'
+                            className='secrets-list-search'
                             type='search'
-                            placeholder='Search'
+                            placeholder='Search by website, username, or email'
                             autoFocus
                             value={searchValue}
                             onChange={(event) => setSearchValue(event.target.value)}
                         />
-                        <div className='secrets-list'>
-                            {
-                                secrets.length === 0 ? (
-                                    <div className='secrets-list-message'>You have no secrets!</div>
-                                ) : filteredSecrets.length === 0 ? (
-                                    <div className='secrets-list-message'>No secrets match your search!</div>
-                                ) : filteredSecrets.map((secret) => (
-                                    <SecretListItem
-                                        key={secret.id}
-                                        {...secret}
-                                        onClick={() => setSecretId(secret.id)}
-                                    />
-                                ))
-                            }
-                        </div>
-                    </>
-                )
-            }
+                    </div>
+                    <Suspense fallback={<SecretsListItem skeleton />}>
+                        <SecretsList searchValue={searchValue} setSecretId={setSecretId} />
+                    </Suspense>
+                </>
+            )}
         </div>
     );
 };

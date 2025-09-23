@@ -1,39 +1,69 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useReducer } from 'react';
 
-import secretsReducer, { ADD_SECRET, DELETE_SECRET, LOAD_SECRETS, UPDATE_SECRET } from '../reducers/secretsReducer';
+import secretsReducer, {
+    ADD_SECRET,
+    DELETE_SECRET,
+    IMPORT_SECRET,
+    LOAD_SECRETS,
+    UPDATE_SECRET,
+} from '../reducers/secretsReducer';
 import { useKey } from './KeyContext';
-import { aesGcmEncrypt } from '../utils';
+import { aesGcmDecrypt, aesGcmEncrypt } from '../utils';
 
 const SecretsContext = createContext();
 
-const SecretsProvider = ({
-    children,
-}) => {
+const SecretsProvider = ({ children }) => {
     const { key } = useKey();
     const [secrets, dispatch] = useReducer(secretsReducer);
 
-    const addSecret = useCallback(async (username, password, website) => {
-        const newSecret = {
-            website,
-            username,
-            password: await aesGcmEncrypt(password, key),
-        };
-        dispatch({
-            type: ADD_SECRET,
-            payload: newSecret,
-        });
-    }, [key]);
+    const mySecretsPromise = useMemo(
+        () =>
+            Promise.allSettled(
+                secrets?.map((secret) => aesGcmDecrypt(secret.password, key).then(() => secret)) ?? [],
+            ).then((results) => results.map(({ value }) => value).filter(Boolean)),
+        [secrets, key],
+    );
 
-    const updateSecret = useCallback(async (secret) => {
-        const newSecret = {
-            ...secret,
-            password: await aesGcmEncrypt(secret.password, key),
-        };
-        dispatch({
-            type: UPDATE_SECRET,
-            payload: newSecret,
-        });
-    }, [key]);
+    const addSecret = useCallback(
+        async (secret) => {
+            const newSecret = {
+                ...secret,
+                password: await aesGcmEncrypt(secret.password, key),
+            };
+            dispatch({
+                type: ADD_SECRET,
+                payload: newSecret,
+            });
+        },
+        [key],
+    );
+
+    const importSecret = useCallback(
+        (secret) => {
+            if (secrets.some(({ id }) => id === secret.id)) {
+                throw new Error(`A secret with the id ${secret.id} already exists`);
+            }
+            dispatch({
+                type: IMPORT_SECRET,
+                payload: secret,
+            });
+        },
+        [secrets],
+    );
+
+    const updateSecret = useCallback(
+        async (secret) => {
+            const newSecret = {
+                ...secret,
+                password: await aesGcmEncrypt(secret.password, key),
+            };
+            dispatch({
+                type: UPDATE_SECRET,
+                payload: newSecret,
+            });
+        },
+        [key],
+    );
 
     const deleteSecret = useCallback((id) => {
         dispatch({
@@ -43,13 +73,12 @@ const SecretsProvider = ({
     }, []);
 
     useEffect(() => {
-        chrome.storage.local.get('keeper-secrets')
-            .then((results = {}) => {
-                dispatch({
-                    type: LOAD_SECRETS,
-                    payload: results['keeper-secrets'] ?? [],
-                });
+        chrome.storage.local.get('keeper-secrets').then((results = {}) => {
+            dispatch({
+                type: LOAD_SECRETS,
+                payload: results['keeper-secrets'] ?? [],
             });
+        });
     }, []);
 
     useEffect(() => {
@@ -60,26 +89,23 @@ const SecretsProvider = ({
         }
     }, [secrets]);
 
-    const value = useMemo(() => ({
-        secrets,
-        addSecret,
-        updateSecret,
-        deleteSecret,
-    }), [secrets, addSecret, updateSecret, deleteSecret]);
-
-    return (
-        <SecretsContext.Provider value={value}>
-            {children}
-        </SecretsContext.Provider>
+    const value = useMemo(
+        () => ({
+            secrets,
+            mySecretsPromise,
+            addSecret,
+            importSecret,
+            updateSecret,
+            deleteSecret,
+        }),
+        [secrets, mySecretsPromise, addSecret, importSecret, updateSecret, deleteSecret],
     );
+
+    return <SecretsContext.Provider value={value}>{children}</SecretsContext.Provider>;
 };
 
-const useSecrets = () => (
-    useContext(SecretsContext)
-);
+const useSecrets = () => use(SecretsContext);
 
-export {
-    useSecrets,
-};
+export { useSecrets };
 
 export default SecretsProvider;
