@@ -21,7 +21,6 @@ const EncryptionForm = ({ id, username = '', email = '', password = '', website 
         onCancel();
     }, [deleteSecret, id, onCancel]);
 
-    // TODO: This should maybe employ the new use hook in React 19
     useEffect(() => {
         aesGcmDecrypt(password, key).then((result) => setDefaultPassword(decode(result)));
     }, [password, key]);

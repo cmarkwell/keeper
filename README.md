@@ -26,7 +26,13 @@ Begin by defining an encryption key
 
 - Convert to TypeScript
 - Add password generator
+- Add branding
 - Explore multiple accounts / key verification
     - If decryption fails, show that the account was encrypted with another key
 - Add ability to export and import secrets
     - If none can be decrypred, shout about it
+- Remove list skeleton thing
+    - Log in should load while loading secrets
+    - Encrypt should load while reloading secrets
+- Add better login flow explanation
+- Add toasts maybe to explain import failures
