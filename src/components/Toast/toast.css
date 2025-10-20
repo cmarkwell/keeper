@@ -1,0 +1,32 @@
+.toast {
+    background-color: rgba(220, 220, 220, 0.9);
+    border-radius: 8px;
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    position: relative;
+}
+
+.toast-body {
+    align-items: center;
+    display: flex;
+    gap: 4px;
+}
+
+.toast-body .keeper-button {
+    background-color: transparent;
+    color: var(--jet);
+}
+
+.toast-body .keeper-button-icon>i {
+    font-size: 0.9rem;
+}
+
+.toast-content {
+    flex: 1 1 auto;
+}
+
+.toast-actions {
+    display: flex;
+    justify-content: flex-end;
+}

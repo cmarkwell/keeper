@@ -1,29 +1,34 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Button from '../../components/Button';
 import { useKey } from '../../contexts/KeyContext';
-import { useSecrets } from '../../contexts/SecretsContext';
 import { aesGcmDecrypt, decode } from '../../utils';
 import PasswordInput from '../PasswordInput';
 
 import './encryptionForm.css';
+import ConfirmDeletePanel from './ConfirmDeletePanel';
 
 const EncryptionForm = ({ id, username = '', email = '', password = '', website = '', onSubmit, onCancel }) => {
     const { key } = useKey();
-    const { deleteSecret } = useSecrets();
 
     const [readOnly, setReadOnly] = useState(id);
     const [defaultPassword, setDefaultPassword] = useState();
-
-    const onClickDelete = useCallback(() => {
-        // TODO: Use custom confirm, browser confirm wrecks the extension
-        deleteSecret(id);
-        onCancel();
-    }, [deleteSecret, id, onCancel]);
+    const [showConfirmDeletePanel, setShowConfirmDeletePanel] = useState(false);
 
     useEffect(() => {
         aesGcmDecrypt(password, key).then((result) => setDefaultPassword(decode(result)));
     }, [password, key]);
+
+    if (showConfirmDeletePanel) {
+        return (
+            <ConfirmDeletePanel
+                id={id}
+                username={username}
+                website={website}
+                onCancel={() => setShowConfirmDeletePanel(false)}
+            />
+        );
+    }
 
     return (
         <>
@@ -40,9 +45,15 @@ const EncryptionForm = ({ id, username = '', email = '', password = '', website 
                         >
                             {readOnly ? 'Edit' : 'Cancel'}
                         </Button>
-                        <Button rightIcon='bi-trash' title='Delete this secret' onClick={onClickDelete}>
-                            Delete
-                        </Button>
+                        {readOnly && (
+                            <Button
+                                rightIcon='bi-trash'
+                                title='Delete this secret'
+                                onClick={() => setShowConfirmDeletePanel(true)}
+                            >
+                                Delete
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>
@@ -55,6 +66,7 @@ const EncryptionForm = ({ id, username = '', email = '', password = '', website 
                         type='text'
                         defaultValue={website}
                         readOnly={readOnly}
+                        autoFocus={!readOnly}
                         required
                     />
                 </div>
@@ -66,7 +78,6 @@ const EncryptionForm = ({ id, username = '', email = '', password = '', website 
                         type='text'
                         defaultValue={username}
                         readOnly={readOnly}
-                        autoFocus={!readOnly}
                         required
                     />
                 </div>
@@ -84,7 +95,9 @@ const EncryptionForm = ({ id, username = '', email = '', password = '', website 
                 <PasswordInput defaultValue={defaultPassword} readOnly={readOnly} required />
                 {!readOnly && (
                     <div className='form-actions'>
-                        <input className='form-actions-item' name='submit' type='submit' value='Encrypt' />
+                        <Button className='form-actions-item' type='submit'>
+                            Encrypt
+                        </Button>
                     </div>
                 )}
             </form>

@@ -3,6 +3,7 @@ import { Suspense, useCallback, useState } from 'react';
 import Button from '../../../components/Button';
 import { useKey } from '../../../contexts/KeyContext';
 import { useSecrets } from '../../../contexts/SecretsContext';
+import { useToast } from '../../../contexts/ToastContext';
 import { aesGcmDecrypt, getFileText } from '../../../utils';
 
 import ExportButton from './ExportButton';
@@ -12,6 +13,7 @@ import './secretsListActions.css';
 const SecretsListActions = ({ onAddNewClicked, onLogOutClicked }) => {
     const { key } = useKey();
     const { importSecret } = useSecrets();
+    const { toast } = useToast();
 
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
 
@@ -19,23 +21,40 @@ const SecretsListActions = ({ onAddNewClicked, onLogOutClicked }) => {
         setIsMoreExpanded((lastIsMoreExpanded) => !lastIsMoreExpanded);
     }, []);
 
-    const onImportClicked = useCallback(() => {
-        window
-            .showOpenFilePicker({ types: [{ accept: { 'text/plain': '.kpr' } }], multiple: true })
-            .then((fileSystemFileHandles) => {
-                fileSystemFileHandles.forEach(async (fileSystemFileHandle) => {
-                    const file = await fileSystemFileHandle.getFile();
-                    const fileText = await getFileText(file);
-                    const importedSecrets = JSON.parse(atob(fileText));
+    const onImportClicked = useCallback(async () => {
+        const fileSystemFileHandles = await window.showOpenFilePicker({
+            types: [{ accept: { 'text/plain': '.kpr' } }],
+            multiple: true,
+        });
 
-                    importedSecrets.forEach((importedSecret) => {
-                        aesGcmDecrypt(importedSecret.password, key)
-                            .then(() => importSecret(importedSecret))
-                            .catch((error) => console.error('Failed to import secret', error));
-                    });
-                });
+        const importPromises = fileSystemFileHandles.flatMap(async (fileSystemFileHandle) => {
+            const file = await fileSystemFileHandle.getFile();
+            const fileText = await getFileText(file);
+            const importedSecrets = JSON.parse(atob(fileText));
+            return importedSecrets.map((importedSecret) =>
+                aesGcmDecrypt(importedSecret.password, key).then(() => importSecret(importedSecret)),
+            );
+        });
+
+        Promise.allSettled(importPromises).then((results) => {
+            const fulfilled = [];
+            const rejected = [];
+            results.forEach((result) => {
+                (result.state === 'fulfilled' ? fulfilled : rejected).push(result);
             });
-    }, [key, importSecret]);
+
+            let content;
+            if (fulfilled.length && rejected.length) {
+                content = `Successfully imported ${fulfilled.length} and failed to import ${rejected.length} accounts`;
+            } else if (fulfilled.length) {
+                content = `Successfully imported ${fulfilled.length} accounts`;
+            } else {
+                content = `Failed to import ${rejected.length} accounts`;
+            }
+
+            toast({ content });
+        });
+    }, [key, importSecret, toast]);
 
     return (
         <>

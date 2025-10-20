@@ -7,25 +7,23 @@ import SecretsListItem from './SecretsListItem';
 import './secretsList.css';
 
 const SecretsList = ({ searchValue, setSecretId }) => {
-    const { mySecretsPromise } = useSecrets();
+    const trimmedSearchValue = searchValue.trim().toLowerCase();
 
+    const { mySecretsPromise } = useSecrets();
     const mySecrets = use(mySecretsPromise);
 
     const filteredMySecrets = useMemo(
         () =>
             mySecrets
-                .filter(({ website, username, email }) => {
-                    const trimmedSearchValue = searchValue.trim().toLowerCase();
-                    return (
-                        website.trim().toLowerCase().includes(trimmedSearchValue) ||
-                        username.trim().toLowerCase().includes(trimmedSearchValue) ||
-                        email.trim().toLowerCase().includes(trimmedSearchValue)
-                    );
-                })
+                .filter(({ website, username, email }) =>
+                    [website, username, email].some((property) =>
+                        property?.trim().toLowerCase().includes(trimmedSearchValue),
+                    ),
+                )
                 .sort((secretA, secretB) =>
                     secretA.website.localeCompare(secretB.website, 'en', { sensitivity: 'base' }),
                 ),
-        [mySecrets, searchValue],
+        [mySecrets, trimmedSearchValue],
     );
 
     return (

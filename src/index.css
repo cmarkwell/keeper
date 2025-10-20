@@ -5,6 +5,10 @@
         url('/LibreBaskerville-Italic.ttf')
 }
 
+:root {
+    --jet: #131516
+}
+
 * {
     font-family: 'Libre Baskerville';
 }

@@ -7,15 +7,18 @@ import SecretsProvider from './contexts/SecretsContext';
 
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
 import './index.css';
+import ToastProvider from './contexts/ToastContext';
 
 const root = document.getElementById('root');
 
 createRoot(root).render(
     <StrictMode>
-        <KeyProvider>
-            <SecretsProvider>
-                <Keeper />
-            </SecretsProvider>
-        </KeyProvider>
+        <ToastProvider>
+            <KeyProvider>
+                <SecretsProvider>
+                    <Keeper />
+                </SecretsProvider>
+            </KeyProvider>
+        </ToastProvider>
     </StrictMode>,
 );

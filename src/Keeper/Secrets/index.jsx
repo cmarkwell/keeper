@@ -66,7 +66,7 @@ const Secrets = () => {
                         <input
                             className='secrets-list-search'
                             type='search'
-                            placeholder='Search by website, username, or email'
+                            placeholder='Search by site, username, or email'
                             autoFocus
                             value={searchValue}
                             onChange={(event) => setSearchValue(event.target.value)}

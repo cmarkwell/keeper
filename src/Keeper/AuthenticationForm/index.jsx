@@ -1,4 +1,5 @@
 import PasswordInput from '../PasswordInput';
+import Button from '../../components/Button';
 
 import './authenticationForm.css';
 
@@ -6,7 +7,9 @@ const AuthenticationForm = ({ onSubmit }) => (
     <form className='authentication-form' onSubmit={onSubmit}>
         <PasswordInput maxLength='32' required autoFocus />
         <div className='form-actions'>
-            <input className='form-actions-item' name='submit' type='submit' value='Unlock' />
+            <Button type='submit' className='form-actions-item'>
+                Unlock
+            </Button>
         </div>
     </form>
 );

@@ -13,6 +13,6 @@
 }
 
 .keeper-header-key {
-    background-color: black;
+    background-color: var(--jet);
     color: white;
 }

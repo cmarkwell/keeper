@@ -3,6 +3,7 @@
     border-radius: 3px;
     border: none;
     display: flex;
+    font-size: 0.9rem;
     gap: 6px;
     justify-content: center;
     padding: 6px;

@@ -2,7 +2,7 @@
 
 An offline password manager Chrome extension
 
-### Installation
+## Installation
 
 1. Install Keeper's dependencies using your preferred node package manager:
 
@@ -16,23 +16,19 @@ npm install
 npm run build
 ```
 
-3. Load the built directory (dist) into Chrome as an unpacked extension
+3. Load the build directory (dist) into Chrome as an unpacked extension
 
-### Usage
+## Usage
 
-Begin by defining an encryption key
+1. Sign in to Keeper with a master password. **Remember this password, all accounts created during the session will be encrypted with it and saved to local storage.**
+2. Add new accounts with usernames, emails, and passwords
+3. Search for and view the details of created accounts
+4. Export and import encrypted account information
 
-### Todo
+## Todo
 
 - Convert to TypeScript
+- Add better login flow explanation to app
 - Add password generator
-- Add branding
 - Explore multiple accounts / key verification
-    - If decryption fails, show that the account was encrypted with another key
-- Add ability to export and import secrets
-    - If none can be decrypred, shout about it
-- Remove list skeleton thing
-    - Log in should load while loading secrets
-    - Encrypt should load while reloading secrets
-- Add better login flow explanation
-- Add toasts maybe to explain import failures
+    - If decryption fails, show that there are accounts encrypted with another key

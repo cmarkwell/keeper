@@ -1,0 +1,34 @@
+.confirm-delete-panel-header {
+    padding: 12px;
+}
+
+.confirm-delete-panel-header .keeper-button {
+    background-color: white;
+    color: black;
+}
+
+.confirm-delete-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 12px;
+}
+
+.confirm-delete-panel * {
+    margin-top: 0;
+    text-align: center;
+}
+
+.confirm-delete-panel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.confirm-delete-panel-actions button {
+    flex: 1 1 auto;
+}
+
+.confirm-delete-panel-actions .cancel-button {
+    background-color: transparent;
+    color: var(--jet);
+}
